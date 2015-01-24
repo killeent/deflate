@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <check.h>
 
-#include "test/util/bitstream_test.h"
+#include "./test/util/bitstream_test.h"
 
 int main() {
   Suite *s;

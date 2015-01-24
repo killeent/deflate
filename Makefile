@@ -9,16 +9,16 @@ UTIL = src/util
 TEST_UTIL = test/util
 
 bitstream.o: $(UTIL)/bitstream.c $(UTIL)/bitstream.h
-	$(CC) $(CFLAGS) -c $(UTIL)/bitstream.c -o bitstream.o
+	$(CC) $(CFLAGS) -c $(UTIL)/bitstream.c
 
-bitstream_test.o: bitstream.o $(TEST_UTIL)/bitstream_test.c $(TEST_UTIL)/bitstream_test.h
-	$(CC) $(CFLAGS) -c $(TEST_UTIL)/bitstream_test.c -o bitstream_test.o
+bitstream_test.o: $(TEST_UTIL)/bitstream_test.c $(TEST_UTIL)/bitstream_test.h
+	$(CC) $(CFLAGS) -c $(TEST_UTIL)/bitstream_test.c -I ~/bin/include
 
-testrunner.o: testrunner.c bitstream_test.o
-	$(CC) $(CFLAGS) -c testrunner.c -o testrunner.o
+testrunner.o: testrunner.c
+	$(CC) $(CFLAGS) -c testrunner.c -I ~/bin/include
 
-testrunner: testrunner.o
-	$(CC) $(CFLAGS) -o testrunner testrunner.o -libcheck
+testrunner: testrunner.o bitstream_test.o bitstream.o
+	$(CC) $(CFLAGS) -o testrunner testrunner.o bitstream_test.o bitstream.o ~/bin/lib/libcheck.so
 
 clean:
 	/bin/rm -f *.o testrunner

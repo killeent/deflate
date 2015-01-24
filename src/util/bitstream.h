@@ -3,6 +3,8 @@
 #ifndef _BITSTREAM_H_
 #define _BITSTREAM_H_
 
+#include <stdio.h>
+
 /**
  * A bitstream is a abstraction layer for bit IO. It allows you to read/write
  * individual bits from/to a file.
@@ -30,7 +32,7 @@ struct bitstream {
  *
  * @return NULL if out of memory, otherwise a pointer to a bitstream.
  */
-struct bitstream *bitstream_create();
+struct bitstream * bitstream_alloc();
 
 /**
  * Frees the memory associated with the bitstream.

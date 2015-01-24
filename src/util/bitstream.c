@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "./bitstream.h"
 
-struct bitstream *bitsream_create() {
+struct bitstream *bitsream_alloc() {
   return (struct bitstream *)malloc(sizeof(struct bitstream));
 }
 
