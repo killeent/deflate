@@ -16,7 +16,7 @@ struct bitstream *bs;
 
 void setup() {
 	// todo: figure out why we can't call bitstream_alloc();
-	bs = (struct bitstream *)malloc(sizeof(struct bitstream));
+	bs = (struct bitstream *)calloc(1, sizeof(struct bitstream));
 	ck_assert(bs != NULL);
 }
 
@@ -112,6 +112,70 @@ START_TEST(read_byte_two_byte_file_test)
 }
 END_TEST
 
+// Tests for reading byte and bits from a two-byte file
+START_TEST(read_mixed_two_byte_file_test)
+{
+  FILE *f;
+  uint8_t byte, bit, i;
+
+  f = fopen(DOUBLE_BYTE_FILE, "r");
+  if (f == NULL) {
+    ck_abort_msg("failed to open file %s", DOUBLE_BYTE_FILE);
+  }
+
+  // this file contains the letter 'a' followed by a newline.
+  // newline in binary: 00001010
+  uint8_t byte_expected = 97;
+  uint8_t bits_expected[16] = {0, 0, 0, 0, 1, 0, 1, 0};
+
+  // read a byte first
+  ck_assert_int_eq(read_byte(bs, f, &byte), 0);
+  ck_assert_int_eq(byte, byte_expected);
+
+  // then the remaining bits
+  for (i = 0; i < 8; i++) {
+    ck_assert_int_eq(read_bit(bs, f, &bit), 0);
+    ck_assert_int_eq(bit, bits_expected[i]);
+  }
+
+  ck_assert_int_eq(read_byte(bs, f, &byte), -1);
+  fclose(f);
+}
+END_TEST
+
+// Tests that reading a byte tosses away any bits left in the
+// bit_buffer
+START_TEST(read_mixed_throws_away_buffer_test)
+{
+  FILE *f;
+  uint8_t byte, bit, i;
+
+  f = fopen(DOUBLE_BYTE_FILE, "r");
+  if (f == NULL) {
+    ck_abort_msg("failed to open file %s", DOUBLE_BYTE_FILE);
+  }
+
+  // this file contains the letter 'a' followed by a newline.
+  // 'a' in binary: 01100001; \n in decimal is 10
+  uint8_t bits_expected[4] = {0, 1, 1, 0};
+  uint8_t byte_expected = 10;
+
+  // read some of the bits in the first byte
+  for (i = 0; i < 4; i++) {
+    ck_assert_int_eq(read_bit(bs, f, &bit), 0);
+    ck_assert_int_eq(bit, bits_expected[i]);
+  }
+
+  // then read the next byte
+  ck_assert_int_eq(read_byte(bs, f, &byte), 0);
+  ck_assert_int_eq(byte, byte_expected);
+
+  // now there should be no bits left to read
+  ck_assert_int_eq(read_bit(bs, f, &bit), -1);
+  fclose(f);
+}
+END_TEST
+
 Suite *bitstream_suite() {
 	Suite *s;
 	TCase *tc_core;
@@ -126,6 +190,8 @@ Suite *bitstream_suite() {
   tcase_add_test(tc_core, read_byte_empty_file_test);
   tcase_add_test(tc_core, read_bit_two_byte_file_test);
   tcase_add_test(tc_core, read_byte_two_byte_file_test);
+  tcase_add_test(tc_core, read_mixed_two_byte_file_test);
+  tcase_add_test(tc_core, read_mixed_throws_away_buffer_test);
 
 	suite_add_tcase(s, tc_core);
 
