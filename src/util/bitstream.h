@@ -82,7 +82,7 @@ int write_bit(struct bitstream *bs, FILE *f, uint8_t bit);
  * Append the specified byte to the end of the file. Note that
  * this will not write any of the current bits in the bit_buffer
  * and will simply write the specified byte. The bit_buffer is
- * cleared when write_bit is called.
+ * cleared when write_byte is called.
  *
  * @param bs the associated bitstream.
  * @param f the file to write to.

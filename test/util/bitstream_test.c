@@ -14,19 +14,32 @@
 #define DOUBLE_BYTE_FILE "./test/util/files/single.txt"
 
 struct bitstream *bs;
+struct bitstream *read_bs;
+struct bitstream *write_bs;
 
 // todo: figure out why we can't call bitstream_alloc();
 struct bitstream *create_bitstream() {
   return (struct bitstream *)calloc(1, sizeof(struct bitstream));
 }
 
-void setup() {
+void read_setup() {
 	bs = create_bitstream();
-	ck_assert(bs != NULL);
+	ck_assert(read_bs != NULL);
 }
 
-void teardown() {
+void read_teardown() {
 	bitstream_destroy(bs);
+}
+
+void write_setup() {
+  read_bs = create_bitstream();
+  write_bs = create_bitstream();
+  ck_assert(read_bs != NULL && write_bs != NULL);
+}
+
+void write_teardown() {
+  bitstream_destroy(read_bs);
+  bitstream_destroy(write_bs);
 }
 
 // Basic test for allocating/freeing a bitstream
@@ -187,7 +200,6 @@ START_TEST(write_bit_single_bit_test)
 {
   FILE *f;
   uint8_t bit, i;
-  struct bitstream *read_bs = create_bitstream();
 
   f = tmpfile();
   if (f == NULL) {
@@ -195,13 +207,13 @@ START_TEST(write_bit_single_bit_test)
   }
 
   // write a single bit
-  ck_assert_int_eq(write_bit(bs, f, 1), 0);
+  ck_assert_int_eq(write_bit(write_bs, f, 1), 0);
 
   // assert that the file is still empty as the bit is buffered
   ck_assert_int_eq(read_bit(read_bs, f, &bit), -1);
 
   // now flush the file
-  ck_assert_int_eq(flush(bs, f), 0);
+  ck_assert_int_eq(flush(write_bs, f), 0);
 
   // the file should be 1000000 in binary
   uint8_t bits_expected[8] = {1, 0, 0, 0, 0, 0, 0, 0};
@@ -217,25 +229,61 @@ START_TEST(write_bit_single_bit_test)
 }
 END_TEST
 
+// Tests writing 8 bits to a file
+START_TEST(write_bit_eight_bits_test)
+{
+  FILE *f;
+  uint8_t bit, i;
+
+  f = tmpfile();
+  if (f == NULL) {
+    ck_abort_msg("failed to create tmp file. error: %d\n", errno);
+  }
+
+  // write the bits to the file
+  uint8_t bits_expected[8] = {1, 0, 1, 1, 0, 0, 1, 0};
+  for (i = 0; i < 8; i++) {
+    ck_assert_int_eq(write_bit(write_bs, f, bits_expected[i]), 0);
+  }
+
+  // now read them back in!
+  ck_assert_int_eq(fseek(f, 0, SEEK_SET), 0);
+  for (i = 0; i < 8; i++) {
+    ck_assert_int_eq(read_bit(read_bs, f, &bit), 0);
+    ck_assert_int_eq(bit, bits_expected[i]);
+  }
+
+  // now there should be no bits left to read
+  ck_assert_int_eq(read_bit(read_bs, f, &bit), -1);
+  fclose(f);
+}
+END_TEST
+
 Suite *bitstream_suite() {
 	Suite *s;
-	TCase *tc_core;
+	TCase *tc_reading, *tc_writing;
 
 	s = suite_create("bitstream");
 
-	tc_core = tcase_create("Core");
-	tcase_add_checked_fixture(tc_core, setup, teardown);
+	tc_reading = tcase_create("reading");
+	tcase_add_checked_fixture(tc_reading, read_setup, read_teardown);
 
-	tcase_add_test(tc_core, alloc_test);
-  tcase_add_test(tc_core, read_bit_empty_file_test);
-  tcase_add_test(tc_core, read_byte_empty_file_test);
-  tcase_add_test(tc_core, read_bit_two_byte_file_test);
-  tcase_add_test(tc_core, read_byte_two_byte_file_test);
-  tcase_add_test(tc_core, read_mixed_two_byte_file_test);
-  tcase_add_test(tc_core, read_mixed_throws_away_buffer_test);
-  tcase_add_test(tc_core, write_bit_single_bit_test);
+  tc_writing = tcase_create("writing");
+  tcase_add_checked_fixture(tc_reading, write_setup, write_teardown);
 
-	suite_add_tcase(s, tc_core);
+	tcase_add_test(tc_reading, alloc_test);
+  tcase_add_test(tc_reading, read_bit_empty_file_test);
+  tcase_add_test(tc_reading, read_byte_empty_file_test);
+  tcase_add_test(tc_reading, read_bit_two_byte_file_test);
+  tcase_add_test(tc_reading, read_byte_two_byte_file_test);
+  tcase_add_test(tc_reading, read_mixed_two_byte_file_test);
+  tcase_add_test(tc_reading, read_mixed_throws_away_buffer_test);
+
+  tcase_add_test(tc_writing, write_bit_single_bit_test);
+  tcase_add_test(tc_writing, write_bit_eight_bits_test);
+
+	suite_add_tcase(s, tc_reading);
+  suite_add_tcase(s, tc_writing);
 
 	return s;
 }
