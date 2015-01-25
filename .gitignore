@@ -32,3 +32,6 @@
 
 # vim swap files
 *.swp
+
+# project specific
+testrunner

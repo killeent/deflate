@@ -79,8 +79,8 @@ START_TEST(read_bit_two_byte_file_test)
 
   uint8_t expected[16] = {0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0};
   for (i = 0; i < 16; i++) {
-    printf("%d\n", i);
-    ck_assert_int_eq(read_bit(bs, f, &bit), expected[i]);
+    ck_assert_int_eq(read_bit(bs, f, &bit), 0);
+    ck_assert_int_eq(bit, expected[i]);
   }
   ck_assert_int_eq(read_bit(bs, f, &bit), -1);
 }

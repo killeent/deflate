@@ -36,10 +36,10 @@ int read_bit(struct bitstream *bs, FILE *f, uint8_t *bit) {
         return ferror(f);
       }
     }
+    bs->bit_count = 8;
   }
 
-  *bit = bs->bit_buffer & 0x1;
-  bs->bit_buffer <<= 1;
+  *bit = (bs->bit_buffer & (1 << (bs->bit_count - 1))) >> (bs->bit_count - 1);
   bs->bit_count--;
   return 0;
 }
