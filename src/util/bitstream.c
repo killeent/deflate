@@ -9,7 +9,13 @@
 #define MAX_BITS 8
 
 struct bitstream *bitsream_alloc() {
-  return (struct bitstream *)malloc(sizeof(struct bitstream));
+  struct bitstream *bs;
+  bs = (struct bitstream *)malloc(sizeof(struct bitstream));
+  if (bs == NULL) {
+    return NULL;
+  }
+  bs->bit_count = 0;
+  return bs;
 }
 
 void bitstream_destroy(struct bitstream *bs) {

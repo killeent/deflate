@@ -5,6 +5,7 @@
 #include <check.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <errno.h>
 
 #include "./bitstream_test.h"
 #include "../../src/util/bitstream.h"
@@ -14,9 +15,13 @@
 
 struct bitstream *bs;
 
+// todo: figure out why we can't call bitstream_alloc();
+struct bitstream *create_bitstream() {
+  return (struct bitstream *)calloc(1, sizeof(struct bitstream));
+}
+
 void setup() {
-	// todo: figure out why we can't call bitstream_alloc();
-	bs = (struct bitstream *)calloc(1, sizeof(struct bitstream));
+	bs = create_bitstream();
 	ck_assert(bs != NULL);
 }
 
@@ -126,7 +131,7 @@ START_TEST(read_mixed_two_byte_file_test)
   // this file contains the letter 'a' followed by a newline.
   // newline in binary: 00001010
   uint8_t byte_expected = 97;
-  uint8_t bits_expected[16] = {0, 0, 0, 0, 1, 0, 1, 0};
+  uint8_t bits_expected[8] = {0, 0, 0, 0, 1, 0, 1, 0};
 
   // read a byte first
   ck_assert_int_eq(read_byte(bs, f, &byte), 0);
@@ -176,6 +181,42 @@ START_TEST(read_mixed_throws_away_buffer_test)
 }
 END_TEST
 
+// Tests writing a single bit to a file; The rest of the
+// byte written should be zero-filled
+START_TEST(write_bit_single_bit_test)
+{
+  FILE *f;
+  uint8_t bit, i;
+  struct bitstream *read_bs = create_bitstream();
+
+  f = tmpfile();
+  if (f == NULL) {
+    ck_abort_msg("failed to create tmp file. error: %d\n", errno);
+  }
+
+  // write a single bit
+  ck_assert_int_eq(write_bit(bs, f, 1), 0);
+
+  // assert that the file is still empty as the bit is buffered
+  ck_assert_int_eq(read_bit(read_bs, f, &bit), -1);
+
+  // now flush the file
+  ck_assert_int_eq(flush(bs, f), 0);
+
+  // the file should be 1000000 in binary
+  uint8_t bits_expected[8] = {1, 0, 0, 0, 0, 0, 0, 0};
+  ck_assert_int_eq(fseek(f, 0, SEEK_SET), 0);
+  for (i = 0; i < 8; i++) {
+    ck_assert_int_eq(read_bit(read_bs, f, &bit), 0);
+    ck_assert_int_eq(bit, bits_expected[i]);
+  }
+
+  // now there should be no bits left to read
+  ck_assert_int_eq(read_bit(read_bs, f, &bit), -1);
+  fclose(f);
+}
+END_TEST
+
 Suite *bitstream_suite() {
 	Suite *s;
 	TCase *tc_core;
@@ -192,6 +233,7 @@ Suite *bitstream_suite() {
   tcase_add_test(tc_core, read_byte_two_byte_file_test);
   tcase_add_test(tc_core, read_mixed_two_byte_file_test);
   tcase_add_test(tc_core, read_mixed_throws_away_buffer_test);
+  tcase_add_test(tc_core, write_bit_single_bit_test);
 
 	suite_add_tcase(s, tc_core);
 
