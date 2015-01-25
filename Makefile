@@ -5,8 +5,12 @@ CFLAGS = -g -Wall -std=gnu11 -O3
 # folders
 SRC = src
 TEST = test
+HUFFMAN = src/huffman
 UTIL = src/util
 TEST_UTIL = test/util
+
+frequency.o: $(HUFFMAN)/frequency.c $(HUFFMAN)/frequency.h
+	$(CC) $(CFLAGS) -c $(HUFFMAN)/frequency.c
 
 bitstream.o: $(UTIL)/bitstream.c $(UTIL)/bitstream.h
 	$(CC) $(CFLAGS) -c $(UTIL)/bitstream.c
