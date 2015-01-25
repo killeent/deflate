@@ -250,6 +250,127 @@ START_TEST(write_bit_eight_bits_test)
 }
 END_TEST
 
+// Tests writing a byte to a file
+START_TEST(write_single_byte_test)
+{
+  FILE *f;
+  uint8_t byte;
+
+  f = tmpfile();
+  if (f == NULL) {
+    ck_abort_msg("failed to create tmp file. error: %d\n", errno);
+  }
+
+  ck_assert_int_eq(write_byte(write_bs, f, 23), 0);
+  ck_assert_int_eq(fseek(f, 0, SEEK_SET), 0);
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), 0);
+  ck_assert_int_eq(byte, 23);
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), -1);
+  fclose(f);
+}
+END_TEST
+
+// Tests writing 8 bits and a byte to the file
+START_TEST(write_mixed_test)
+{
+  FILE *f;
+  uint8_t bit, byte, i;
+
+  f = tmpfile();
+  if (f == NULL) {
+    ck_abort_msg("failed to create tmp file. error: %d\n", errno);
+  }
+
+  // write the bits to the file
+  uint8_t bits_expected[8] = {1, 1, 1, 0, 0, 0, 1, 1};
+  for (i = 0; i < 8; i++) {
+    ck_assert_int_eq(write_bit(write_bs, f, bits_expected[i]), 0);
+  }
+
+  // write the byte
+  uint8_t byte_expected = 112;
+  ck_assert_int_eq(write_byte(write_bs, f, byte_expected), 0);
+
+  // read the bits back in
+  ck_assert_int_eq(fseek(f, 0, SEEK_SET), 0);
+  for (i = 0; i < 8; i++) {
+    ck_assert_int_eq(read_bit(read_bs, f, &bit), 0);
+    ck_assert_int_eq(bit, bits_expected[i]);
+  }
+
+  // read the byte back in
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), 0);
+  ck_assert_int_eq(byte, byte_expected);
+
+  // should be EOF
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), -1);
+  fclose(f);
+}
+END_TEST
+
+// Tests writing 16 bits to a file
+START_TEST(write_bit_sixteen_bits_test)
+{
+  FILE *f;
+  uint8_t bit, i;
+
+  f = tmpfile();
+  if (f == NULL) {
+    ck_abort_msg("failed to create tmp file. error: %d\n", errno);
+  }
+
+  // write the bits to the file
+  uint8_t bits_expected[16] = {1,1,0,1,0,0,1,1,0,0,1,0,0,0,1,0};
+  for (i = 0; i < 16; i++) {
+    ck_assert_int_eq(write_bit(write_bs, f, bits_expected[i]), 0);
+  }
+
+  // now read them back in!
+  ck_assert_int_eq(fseek(f, 0, SEEK_SET), 0);
+  for (i = 0; i < 16; i++) {
+    ck_assert_int_eq(read_bit(read_bs, f, &bit), 0);
+    ck_assert_int_eq(bit, bits_expected[i]);
+  }
+
+  // now there should be no bits left to read
+  ck_assert_int_eq(read_bit(read_bs, f, &bit), -1);
+  fclose(f);
+}
+END_TEST
+
+// Tests that writing a byte throws away the contents of the
+// stream buffer
+START_TEST(write_mixed_throws_away_buffer_test)
+{
+  FILE *f;
+  uint8_t byte, bit, i;
+
+  f = tmpfile();
+  if (f == NULL) {
+    ck_abort_msg("failed to create tmp file. error: %d\n", errno);
+  }
+
+  // write the bits to the file
+  uint8_t bits_expected[4] = {1,1,0,1};
+  for (i = 0; i < 4; i++) {
+    ck_assert_int_eq(write_bit(write_bs, f, bits_expected[i]), 0);
+  }
+
+  // write the byte
+  uint8_t byte_expected = 47;
+  ck_assert_int_eq(write_byte(write_bs, f, byte_expected), 0);
+
+  // read the byte back in
+  ck_assert_int_eq(fseek(f, 0, SEEK_SET), 0);
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), 0);
+  ck_assert_int_eq(byte, byte_expected);
+
+  // now there should be no bits left to read
+  ck_assert_int_eq(read_bit(read_bs, f, &bit), -1);
+  fclose(f);
+}
+END_TEST
+
 Suite *bitstream_suite() {
 	Suite *s;
 	TCase *tc_core;
@@ -258,7 +379,6 @@ Suite *bitstream_suite() {
 
 	tc_core = tcase_create("core");
 	tcase_add_checked_fixture(tc_core, setup, teardown);
-
 
 	tcase_add_test(tc_core, alloc_test);
   tcase_add_test(tc_core, read_bit_empty_file_test);
@@ -270,6 +390,10 @@ Suite *bitstream_suite() {
 
   tcase_add_test(tc_core, write_bit_single_bit_test);
   tcase_add_test(tc_core, write_bit_eight_bits_test);
+  tcase_add_test(tc_core, write_single_byte_test);
+  tcase_add_test(tc_core, write_mixed_test);
+  tcase_add_test(tc_core, write_bit_sixteen_bits_test);
+  tcase_add_test(tc_core, write_mixed_throws_away_buffer_test);
 
 	suite_add_tcase(s, tc_core);
 

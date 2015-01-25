@@ -107,8 +107,7 @@ int write_byte(struct bitstream *bs, FILE *f, uint8_t byte) {
   if (written != 1) {
     return ferror(f);
   } else {
-    bs->bit_buffer = 0;
-    bs->bit_count = 0;
+    bitstream_clear(bs);
     return 0;
   }
 }
@@ -117,13 +116,5 @@ int flush(struct bitstream *bs, FILE *f) {
   assert(bs != NULL);
   assert(f != NULL);
 
-  size_t written;
-
-  written = fwrite((void *)&(bs->bit_buffer), sizeof(bs->bit_buffer), 1, f); 
-  if (written == 0) {
-    return ferror(f);
-  } else {
-    bs->bit_count = 0;
-    return 0;
-  }
+  return write_byte(bs, f, bs->bit_buffer);
 }
