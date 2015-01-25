@@ -11,6 +11,7 @@
 struct bitstream *bs;
 
 void setup() {
+	// todo: figure out why we can't call bitstream_alloc();
 	bs = (struct bitstream *)malloc(sizeof(struct bitstream));
 	ck_assert(bs != NULL);
 }

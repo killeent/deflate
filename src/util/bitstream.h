@@ -48,7 +48,7 @@ void bitstream_destroy(struct bitstream *bs);
  * @param f the file to read from.
  * @param bit output parameter to store the bit read.
  *
- * @return 0 on success, otherwise error related to file reading.
+ * @return 0 on success, -1 on EOF, otherwise error related to file reading.
  */
 int read_bit(struct bitstream *bs, FILE *f, uint8_t *bit);
 
