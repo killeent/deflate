@@ -63,7 +63,7 @@ int read_bit(struct bitstream *bs, FILE *f, uint8_t *bit);
  *
  * @return 0 on success, otherwise error related to file reading.
  */
-int read_byte(struct bitstream *bs, FILE *f, uint32_t *byte);
+int read_byte(struct bitstream *bs, FILE *f, uint8_t *byte);
 
 /**
  * Append the specified bit to the end of the file. Note that the
@@ -90,7 +90,7 @@ int write_bit(struct bitstream *bs, FILE *f, uint8_t bit);
  *
  * @return 0 on success, otherwise error related to file writing.
  */
-int write_byte(struct bitstream *bs, FILE *f, uint32_t byte);
+int write_byte(struct bitstream *bs, FILE *f, uint8_t byte);
 
 /**
  * Write the bits in the bit_buffer to the file. If there are 7

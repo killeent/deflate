@@ -36,7 +36,7 @@ int read_bit(struct bitstream *bs, FILE *f, uint8_t *bit) {
         return ferror(f);
       }
     }
-    bs->bit_count = 8;
+    bs->bit_count = MAX_BITS;
   }
 
   *bit = (bs->bit_buffer & (1 << (bs->bit_count - 1))) >> (bs->bit_count - 1);
@@ -44,7 +44,7 @@ int read_bit(struct bitstream *bs, FILE *f, uint8_t *bit) {
   return 0;
 }
 
-int read_byte(struct bitstream *bs, FILE *f, uint32_t *byte) {
+int read_byte(struct bitstream *bs, FILE *f, uint8_t *byte) {
   assert(bs != NULL);
   assert(f != NULL);
   assert(byte != NULL);
@@ -85,7 +85,7 @@ int write_bit(struct bitstream *bs, FILE *f, uint8_t bit) {
   return 0;
 }
 
-int write_byte(struct bitstream *bs, FILE *f, uint32_t byte) {
+int write_byte(struct bitstream *bs, FILE *f, uint8_t byte) {
   assert(bs != NULL);
   assert(f != NULL);
 

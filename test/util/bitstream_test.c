@@ -42,6 +42,7 @@ START_TEST(read_bit_empty_file_test)
   }
 
   ck_assert_int_eq(read_bit(bs, f, &bit), -1);
+  fclose(f);
 }
 END_TEST
 
@@ -49,14 +50,15 @@ END_TEST
 START_TEST(read_byte_empty_file_test)
 {
   FILE *f;
-  uint8_t bit;
+  uint8_t byte;
 
   f = fopen(EMPTY_FILE, "r");
   if (f == NULL) {
     ck_abort_msg("failed to open file %s", EMPTY_FILE);
   }
 
-  ck_assert_int_eq(read_bit(bs, f, &bit), -1);
+  ck_assert_int_eq(read_byte(bs, f, &byte), -1);
+  fclose(f);
 }
 END_TEST
 
@@ -83,6 +85,30 @@ START_TEST(read_bit_two_byte_file_test)
     ck_assert_int_eq(bit, expected[i]);
   }
   ck_assert_int_eq(read_bit(bs, f, &bit), -1);
+  fclose(f);
+}
+END_TEST
+
+// Tests for reading bytes from a two-byte file
+START_TEST(read_byte_two_byte_file_test)
+{
+  FILE *f;
+  uint8_t byte, i;
+
+  f = fopen(DOUBLE_BYTE_FILE, "r");
+  if (f == NULL) {
+    ck_abort_msg("failed to open file %s", DOUBLE_BYTE_FILE);
+  }
+
+  // this file contains the letter 'a' followed by a newline.
+  uint8_t expected[2] = {97, 10};
+
+  for (i = 0; i < 2; i++) {
+    ck_assert_int_eq(read_byte(bs, f, &byte), 0);
+    ck_assert_int_eq(byte, expected[i]);
+  }
+  ck_assert_int_eq(read_byte(bs, f, &byte), -1);
+  fclose(f);
 }
 END_TEST
 
@@ -99,6 +125,7 @@ Suite *bitstream_suite() {
   tcase_add_test(tc_core, read_bit_empty_file_test);
   tcase_add_test(tc_core, read_byte_empty_file_test);
   tcase_add_test(tc_core, read_bit_two_byte_file_test);
+  tcase_add_test(tc_core, read_byte_two_byte_file_test);
 
 	suite_add_tcase(s, tc_core);
 
