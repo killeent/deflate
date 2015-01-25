@@ -10,6 +10,7 @@
 #include "../../src/util/bitstream.h"
 
 #define EMPTY_FILE "./test/util/files/empty.txt"
+#define DOUBLE_BYTE_FILE "./test/util/files/single.txt"
 
 struct bitstream *bs;
 
@@ -57,7 +58,32 @@ START_TEST(read_byte_empty_file_test)
 
   ck_assert_int_eq(read_bit(bs, f, &bit), -1);
 }
+END_TEST
 
+// Tests reading the bits from a two byte file (char + newline)
+START_TEST(read_bit_two_byte_file_test)
+{
+  FILE *f;
+  uint8_t bit, i;
+
+  f = fopen(DOUBLE_BYTE_FILE, "r");
+  if (f == NULL) {
+    ck_abort_msg("failed to open file %s", DOUBLE_BYTE_FILE);
+  }
+
+  // this file contains the letter 'a' followed by a newline.
+  // on a little-endian machine (e.g. x86_64) this is represented
+  // by the following bit sequence:
+  //
+  // 01100001 00001010
+
+  uint8_t expected[16] = {0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0};
+  for (i = 0; i < 16; i++) {
+    printf("%d\n", i);
+    ck_assert_int_eq(read_bit(bs, f, &bit), expected[i]);
+  }
+  ck_assert_int_eq(read_bit(bs, f, &bit), -1);
+}
 END_TEST
 
 Suite *bitstream_suite() {
@@ -72,6 +98,7 @@ Suite *bitstream_suite() {
 	tcase_add_test(tc_core, alloc_test);
   tcase_add_test(tc_core, read_bit_empty_file_test);
   tcase_add_test(tc_core, read_byte_empty_file_test);
+  tcase_add_test(tc_core, read_bit_two_byte_file_test);
 
 	suite_add_tcase(s, tc_core);
 
