@@ -42,6 +42,13 @@ struct bitstream * bitstream_alloc();
 void bitstream_destroy(struct bitstream *bs);
 
 /**
+ * Clears the contents of the bitstream.
+ *
+ * @param bs the associated bitstream to clear.
+ */
+void bitstream_clear(struct bitstream *bs);
+
+/**
  * Reads the next bit from the file and store it in bit.
  *
  * @param bs the associated bitstream.

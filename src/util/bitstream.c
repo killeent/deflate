@@ -14,6 +14,7 @@ struct bitstream *bitsream_alloc() {
   if (bs == NULL) {
     return NULL;
   }
+  bs->bit_buffer = 0;
   bs->bit_count = 0;
   return bs;
 }
@@ -21,6 +22,11 @@ struct bitstream *bitsream_alloc() {
 void bitstream_destroy(struct bitstream *bs) {
   assert(bs != NULL);
   free(bs);
+}
+
+void bitstream_clear(struct bitstream *bs) {
+  bs->bit_count = 0;
+  bs->bit_buffer = 0;
 }
 
 int read_bit(struct bitstream *bs, FILE *f, uint8_t *bit) {

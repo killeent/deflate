@@ -35,3 +35,6 @@
 
 # project specific
 testrunner
+
+# osx specific
+.DS_Store

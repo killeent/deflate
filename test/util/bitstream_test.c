@@ -2,6 +2,7 @@
 //
 // Test Suite for the bitstream IO class
 
+#include <stdlib.h>
 #include <check.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -13,7 +14,6 @@
 #define EMPTY_FILE "./test/util/files/empty.txt"
 #define DOUBLE_BYTE_FILE "./test/util/files/single.txt"
 
-struct bitstream *bs;
 struct bitstream *read_bs;
 struct bitstream *write_bs;
 
@@ -22,22 +22,13 @@ struct bitstream *create_bitstream() {
   return (struct bitstream *)calloc(1, sizeof(struct bitstream));
 }
 
-void read_setup() {
-	bs = create_bitstream();
-	ck_assert(read_bs != NULL);
-}
-
-void read_teardown() {
-	bitstream_destroy(bs);
-}
-
-void write_setup() {
+void setup() {
   read_bs = create_bitstream();
   write_bs = create_bitstream();
   ck_assert(read_bs != NULL && write_bs != NULL);
 }
 
-void write_teardown() {
+void teardown() {
   bitstream_destroy(read_bs);
   bitstream_destroy(write_bs);
 }
@@ -59,7 +50,7 @@ START_TEST(read_bit_empty_file_test)
     ck_abort_msg("failed to open file %s", EMPTY_FILE);
   }
 
-  ck_assert_int_eq(read_bit(bs, f, &bit), -1);
+  ck_assert_int_eq(read_bit(read_bs, f, &bit), -1);
   fclose(f);
 }
 END_TEST
@@ -75,7 +66,7 @@ START_TEST(read_byte_empty_file_test)
     ck_abort_msg("failed to open file %s", EMPTY_FILE);
   }
 
-  ck_assert_int_eq(read_byte(bs, f, &byte), -1);
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), -1);
   fclose(f);
 }
 END_TEST
@@ -99,10 +90,10 @@ START_TEST(read_bit_two_byte_file_test)
 
   uint8_t expected[16] = {0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0};
   for (i = 0; i < 16; i++) {
-    ck_assert_int_eq(read_bit(bs, f, &bit), 0);
+    ck_assert_int_eq(read_bit(read_bs, f, &bit), 0);
     ck_assert_int_eq(bit, expected[i]);
   }
-  ck_assert_int_eq(read_bit(bs, f, &bit), -1);
+  ck_assert_int_eq(read_bit(read_bs, f, &bit), -1);
   fclose(f);
 }
 END_TEST
@@ -122,10 +113,10 @@ START_TEST(read_byte_two_byte_file_test)
   uint8_t expected[2] = {97, 10};
 
   for (i = 0; i < 2; i++) {
-    ck_assert_int_eq(read_byte(bs, f, &byte), 0);
+    ck_assert_int_eq(read_byte(read_bs, f, &byte), 0);
     ck_assert_int_eq(byte, expected[i]);
   }
-  ck_assert_int_eq(read_byte(bs, f, &byte), -1);
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), -1);
   fclose(f);
 }
 END_TEST
@@ -147,16 +138,16 @@ START_TEST(read_mixed_two_byte_file_test)
   uint8_t bits_expected[8] = {0, 0, 0, 0, 1, 0, 1, 0};
 
   // read a byte first
-  ck_assert_int_eq(read_byte(bs, f, &byte), 0);
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), 0);
   ck_assert_int_eq(byte, byte_expected);
 
   // then the remaining bits
   for (i = 0; i < 8; i++) {
-    ck_assert_int_eq(read_bit(bs, f, &bit), 0);
+    ck_assert_int_eq(read_bit(read_bs, f, &bit), 0);
     ck_assert_int_eq(bit, bits_expected[i]);
   }
 
-  ck_assert_int_eq(read_byte(bs, f, &byte), -1);
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), -1);
   fclose(f);
 }
 END_TEST
@@ -180,16 +171,16 @@ START_TEST(read_mixed_throws_away_buffer_test)
 
   // read some of the bits in the first byte
   for (i = 0; i < 4; i++) {
-    ck_assert_int_eq(read_bit(bs, f, &bit), 0);
+    ck_assert_int_eq(read_bit(read_bs, f, &bit), 0);
     ck_assert_int_eq(bit, bits_expected[i]);
   }
 
   // then read the next byte
-  ck_assert_int_eq(read_byte(bs, f, &byte), 0);
+  ck_assert_int_eq(read_byte(read_bs, f, &byte), 0);
   ck_assert_int_eq(byte, byte_expected);
 
   // now there should be no bits left to read
-  ck_assert_int_eq(read_bit(bs, f, &bit), -1);
+  ck_assert_int_eq(read_bit(read_bs, f, &bit), -1);
   fclose(f);
 }
 END_TEST
@@ -261,29 +252,26 @@ END_TEST
 
 Suite *bitstream_suite() {
 	Suite *s;
-	TCase *tc_reading, *tc_writing;
+	TCase *tc_core;
 
 	s = suite_create("bitstream");
 
-	tc_reading = tcase_create("reading");
-	tcase_add_checked_fixture(tc_reading, read_setup, read_teardown);
+	tc_core = tcase_create("core");
+	tcase_add_checked_fixture(tc_core, setup, teardown);
 
-  tc_writing = tcase_create("writing");
-  tcase_add_checked_fixture(tc_reading, write_setup, write_teardown);
 
-	tcase_add_test(tc_reading, alloc_test);
-  tcase_add_test(tc_reading, read_bit_empty_file_test);
-  tcase_add_test(tc_reading, read_byte_empty_file_test);
-  tcase_add_test(tc_reading, read_bit_two_byte_file_test);
-  tcase_add_test(tc_reading, read_byte_two_byte_file_test);
-  tcase_add_test(tc_reading, read_mixed_two_byte_file_test);
-  tcase_add_test(tc_reading, read_mixed_throws_away_buffer_test);
+	tcase_add_test(tc_core, alloc_test);
+  tcase_add_test(tc_core, read_bit_empty_file_test);
+  tcase_add_test(tc_core, read_byte_empty_file_test);
+  tcase_add_test(tc_core, read_bit_two_byte_file_test);
+  tcase_add_test(tc_core, read_byte_two_byte_file_test);
+  tcase_add_test(tc_core, read_mixed_two_byte_file_test);
+  tcase_add_test(tc_core, read_mixed_throws_away_buffer_test);
 
-  tcase_add_test(tc_writing, write_bit_single_bit_test);
-  tcase_add_test(tc_writing, write_bit_eight_bits_test);
+  tcase_add_test(tc_core, write_bit_single_bit_test);
+  tcase_add_test(tc_core, write_bit_eight_bits_test);
 
-	suite_add_tcase(s, tc_reading);
-  suite_add_tcase(s, tc_writing);
+	suite_add_tcase(s, tc_core);
 
 	return s;
 }

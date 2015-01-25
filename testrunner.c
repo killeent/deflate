@@ -18,7 +18,7 @@ int main() {
   // for debugging
   srunner_set_fork_status(runner, CK_NOFORK);
 
-  srunner_run_all(runner, CK_NORMAL);
+  srunner_run_all(runner, CK_VERBOSE);
   failures = srunner_ntests_failed(runner);
   srunner_free(runner);
   return failures;
