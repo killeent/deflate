@@ -8,11 +8,12 @@
  * Internally this constructs a new long array and stores it in output param
  * freqs, where freqs[i] = count of ASCII character i in file.
  *
- * @param the file to calculate frequencies for.
+ * @param file the file to calculate frequencies for.
  * @param freqs output parameter for frequency array.
+ * @param len output parameter for the length of the array created.
  *
  * @return 0 on success, otherwise error. 
  */
-int calc_frequencies(char *file, unsigned long **freqs);
+int calc_frequencies(char *file, unsigned long **freqs, unsigned int *len);
 
 #endif

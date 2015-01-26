@@ -9,10 +9,8 @@
 #include <errno.h>
 
 #include "./bitstream_test.h"
+#include "../files/test_files.h"
 #include "../../src/util/bitstream.h"
-
-#define EMPTY_FILE "./test/util/files/empty.txt"
-#define DOUBLE_BYTE_FILE "./test/util/files/single.txt"
 
 struct bitstream *read_bs;
 struct bitstream *write_bs;

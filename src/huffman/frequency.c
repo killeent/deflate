@@ -6,7 +6,9 @@
 #include <errno.h>
 #include "./frequency.h"
 
-int calc_frequencies(char *file, unsigned long **freqs) {
+#define ARR_SIZE 128
+
+int calc_frequencies(char *file, unsigned long **freqs, unsigned int *len) {
   assert(file != NULL);
   assert(freqs != NULL);
   
@@ -18,11 +20,12 @@ int calc_frequencies(char *file, unsigned long **freqs) {
     return errno;
   }  
 
-  *freqs = (unsigned long *)calloc(128, sizeof(unsigned long));
+  *freqs = (unsigned long *)calloc(ARR_SIZE, sizeof(unsigned long));
   if (freqs == NULL) {
     fclose(f);
     return errno;
   }
+  *len = ARR_SIZE;
 
   // count the frequency of the characters in the file
   while ((ch = fgetc(f)) != EOF) {
