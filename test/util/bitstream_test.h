@@ -1,4 +1,4 @@
-// Original Author: Trevor Killeen (2014)
+// Original Author: Trevor Killeen (2015)
 
 #include <check.h>
 

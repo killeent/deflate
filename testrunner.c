@@ -6,14 +6,18 @@
 #include <check.h>
 
 #include "./test/util/bitstream_test.h"
+#include "./test/huffman/frequency_test.h"
 
 int main() {
-  Suite *s;
+  Suite *bs, *freq;
   SRunner *runner;
   int failures;
 
-  s = bitstream_suite();
-  runner = srunner_create(s);
+  bs = bitstream_suite();
+  freq = frequency_suite();
+
+  runner = srunner_create(bs);
+  srunner_add_suite(runner, freq);
 
   // for debugging
   srunner_set_fork_status(runner, CK_NOFORK);
