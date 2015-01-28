@@ -20,8 +20,8 @@ int calc_frequencies(char *file, unsigned long **freqs, unsigned int *len) {
     return errno;
   }  
 
-  *freqs = (unsigned long *)calloc(ARR_SIZE, sizeof(unsigned long));
-  if (freqs == NULL) {
+  unsigned long *arr = (unsigned long *)calloc(ARR_SIZE, sizeof(unsigned long));
+  if (arr == NULL) {
     fclose(f);
     return errno;
   }
@@ -29,16 +29,17 @@ int calc_frequencies(char *file, unsigned long **freqs, unsigned int *len) {
 
   // count the frequency of the characters in the file
   while ((ch = fgetc(f)) != EOF) {
-    *freqs[ch] += 1;
+    arr[ch] += 1;
   }
   
   // check and see if an error caused the EOF
   if ((err = ferror(f)) != 0) {
-    free(*freqs);
+    free(arr);
     fclose(f);
     return err; 
   }
 
+  *freqs = arr;
   fclose(f);
   return 0;
 }
