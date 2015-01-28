@@ -21,7 +21,7 @@ def main():
 		sys.exit(1)
 
 	for i in range(0, 256):
-		output.write(struct.pack('i', i))
+		output.write(struct.pack('B', i))
 
 	output.close()
 
