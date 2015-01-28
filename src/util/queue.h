@@ -6,7 +6,6 @@
 // A simple Queue ADT implemented with a Linked List
 
 struct queue_node {
-  struct queue_node *prev;
   struct queue_node *next;
   void *payload;
 };

@@ -20,13 +20,13 @@ struct bitstream *create_bitstream() {
   return (struct bitstream *)calloc(1, sizeof(struct bitstream));
 }
 
-void setup() {
+static void setup() {
   read_bs = create_bitstream();
   write_bs = create_bitstream();
   ck_assert(read_bs != NULL && write_bs != NULL);
 }
 
-void teardown() {
+static void teardown() {
   bitstream_destroy(read_bs);
   bitstream_destroy(write_bs);
 }

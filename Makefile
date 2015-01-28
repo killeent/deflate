@@ -13,7 +13,7 @@ TEST_UTIL = test/util
 
 # files
 OBJECTS = testrunner.o bitstream_test.o bitstream.o frequency.o frequency_test.o \
-hufftree.o queue.o
+hufftree.o queue.o queue_test.o
 
 frequency.o: $(HUFFMAN)/frequency.c $(HUFFMAN)/frequency.h
 	$(CC) $(CFLAGS) -c $(HUFFMAN)/frequency.c
