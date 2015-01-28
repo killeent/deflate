@@ -4,6 +4,7 @@
 #define _HUFFTREE_H_
 
 #include <stdbool.h>
+#include <stdio.h>
 
 /**
  * This header file defines various operations related to
@@ -12,13 +13,13 @@
  */
 
 struct huffman_node {
-  bool internal;        // is the node an internal node
-  long freq;            // frequency of the character at this node
-                        // if not an internal node
-  char val;             // char associated with this node if not
-                        // an internal node
-  huffman_node *left;   // left child
-  huffman_node *right;  // right child
+  bool internal;               // is the node an internal node
+  long freq;                   // frequency of the character at this node
+                               // if not an internal node
+  char val;                    // char associated with this node if not
+                               // an internal node
+  struct huffman_node *left;   // left child
+  struct huffman_node *right;  // right child
 };
 
 /*
@@ -72,9 +73,33 @@ int compress_tree_to_file(struct huffman_node *root, FILE *file,
 int decompress_tree_from_file(FILE *file, int offset,
   struct huffman_node **root);
 
+/**
+ * Writes the specified file in compressed form to the specified
+ * output file using the encoding defined by passed tree.
+ *
+ * @param root tree that defines the compression.
+ * @param input input file to compress.
+ * @param output output file to write to.
+ * @param offset offset within the output file to begin writing
+ * the compressed input to.
+ *
+ * @return 0 on success, otherwise rror.
+ */
 int compress_file_using_tree(struct huffman_node *root, FILE *input,
   FILE *output, int offset);
 
+/**
+ read * the specified file in compressed form and decompress it and
+ * write it to output file using the encoding defined by passed tree.
+ *
+ * @param root tree that defines the compression.
+ * @param input input file to decompress.
+ * @param output output file to write the decompressed file to. 
+ * @param offset offset within the output file to begin writing
+ * the decompressed input to.
+ *
+ * @return 0 on success, otherwise rror.
+ */
 int reconstruct_file_using_tree(struct huffman_node *root, FILE *input,
   FILE *output, int offset);
 

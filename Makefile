@@ -12,13 +12,20 @@ UTIL = src/util
 TEST_UTIL = test/util
 
 # files
-OBJECTS = testrunner.o bitstream_test.o bitstream.o frequency.o frequency_test.o
+OBJECTS = testrunner.o bitstream_test.o bitstream.o frequency.o frequency_test.o \
+hufftree.o
 
 frequency.o: $(HUFFMAN)/frequency.c $(HUFFMAN)/frequency.h
 	$(CC) $(CFLAGS) -c $(HUFFMAN)/frequency.c
 
 frequency_test.o: $(TEST_HUFFMAN)/frequency_test.c $(TEST_HUFFMAN)/frequency_test.h $(TEST_FILES)/test_files.h
 	$(CC) $(CFLAGS) -c $(TEST_HUFFMAN)/frequency_test.c
+
+hufftree.o: $(HUFFMAN)/hufftree.c $(HUFFMAN)/hufftree.h
+	$(CC) $(CFLAGS) -c $(HUFFMAN)/hufftree.c
+
+hufftree_test.o: $(TEST_HUFFMAN)/hufftree_test.c $(TEST_HUFFMAN).hufftree_test.h
+	$(CC) $(CFLAGS) -c $(TEST_HUFFMAN)/hufftree_test.c
 
 bitstream.o: $(UTIL)/bitstream.c $(UTIL)/bitstream.h
 	$(CC) $(CFLAGS) -c $(UTIL)/bitstream.c
