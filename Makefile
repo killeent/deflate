@@ -13,7 +13,7 @@ TEST_UTIL = test/util
 
 # files
 OBJECTS = testrunner.o bitstream_test.o bitstream.o frequency.o frequency_test.o \
-hufftree.o
+hufftree.o queue.o
 
 frequency.o: $(HUFFMAN)/frequency.c $(HUFFMAN)/frequency.h
 	$(CC) $(CFLAGS) -c $(HUFFMAN)/frequency.c
@@ -32,6 +32,12 @@ bitstream.o: $(UTIL)/bitstream.c $(UTIL)/bitstream.h
 
 bitstream_test.o: $(TEST_UTIL)/bitstream_test.c $(TEST_UTIL)/bitstream_test.h $(TEST_FILES)/test_files.h
 	$(CC) $(CFLAGS) -c $(TEST_UTIL)/bitstream_test.c
+
+queue.o: $(UTIL)/queue.c $(UTIL)/queue.h
+	$(CC) $(CFLAGS) -c $(UTIL)/queue.c
+
+queue_test.o: $(TEST_UTIL)/queue_test.c $(TEST_UTIL)/queue_test.h
+	$(CC) $(CFLAGS) -c $(TEST_UTIL)/queue_test.c
 
 testrunner.o: testrunner.c
 	$(CC) $(CFLAGS) -c testrunner.c
