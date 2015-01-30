@@ -21,7 +21,7 @@ void free_queue(struct queue *q, void (*free_fn)(void *)) {
   
   // free all the payloads
   iter = q->head;
-  while (iter != NULL) {
+while (iter != NULL) {
     free_fn(iter->payload);
     iter = iter->next;
   }
@@ -44,6 +44,7 @@ int enqueue(struct queue *q, void *payload) {
   if (n == NULL) {
     return 1;
   }
+  n->payload = payload;
   
   if (q->head == NULL && q->tail == NULL) {
     // queue is empty
