@@ -34,6 +34,8 @@ START_TEST(empty_file_test)
   for(i = 0; i < len; i++) {
     ck_assert(freqs[i] == 0);
   }
+
+  free(freqs);
 }
 END_TEST
 
