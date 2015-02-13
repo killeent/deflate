@@ -140,9 +140,6 @@ START_TEST(queue_free_multiple_elements_test)
 }
 END_TEST
 
-// todo: add tests for interleaved ordering; freeing empty, single
-// and multi-element queues
-
 Suite *queue_suite() {
 	Suite *s;
 	TCase *tc_core;

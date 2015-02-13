@@ -17,21 +17,10 @@ void free_queue(struct queue *q, void (*free_fn)(void *)) {
   assert(q != NULL);
   assert(free_fn != NULL);  
 
-  struct queue_node *iter, *temp;
-  
-  // free all the payloads
-  iter = q->head;
-while (iter != NULL) {
-    free_fn(iter->payload);
-    iter = iter->next;
-  }
+  void *iter;
 
-  // free the nodes themselves
-  iter = q->head;
-  while (iter != NULL) {
-    temp = iter->next;
-    free(iter);
-    iter = temp;
+  while ((iter = dequeue(q)) != NULL) {
+    free_fn(iter);
   }
 
   free(q);
