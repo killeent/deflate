@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <check.h>
+#include <errno.h>
 
 #include "./directory_util_test.h"
 #include "../files/test_files.h"
@@ -26,17 +27,20 @@ static void teardown() {
 	free_queue(q, free_str);	
 }
 
+// helper function
+
 // tests trying to crawl a directory specified by an invalid path
 START_TEST(crawl_invalid_directory_test)
 {
-
+	char *invalid_dir = "adjkadjkads\n";
+	ck_assert_int_eq(crawl_directory(invalid_dir, q), ENOENT);
 }
 END_TEST
 
 // tests trying to crawl a directory path that is actually a file
 START_TEST(crawl_file_directory_test)
 {
-
+	ck_assert_int_eq(crawl_directory(EMPTY_FILE, q), ENOTDIR);	
 }
 END_TEST
 
