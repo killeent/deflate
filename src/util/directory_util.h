@@ -15,6 +15,7 @@
  *
  * @param path to the directory to crawl.
  * @param files output parameter, a queue to store the paths of files in.
+ * It is the client's responsibility to allocate and free this queue.
  *
  * @return 0 on success, otherwise error. 
  */
