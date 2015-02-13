@@ -31,6 +31,12 @@ int crawl_directory(char *path, struct queue *files) {
 		// only make make a copy of the file name if it is a directory
 		// or a regular file
 		if (file_type == DT_DIR || file_type == DT_REG) {
+			// check if '.' or '..'
+			if (strncmp(de->d_name, ".", 1) == 0 || 
+					strncmp(de->d_name, "..", 2) == 0) {
+				continue;
+			}		
+
 			file_name = (char *)malloc(de->d_namlen);
 			if (file_name == NULL) {
 				return errno;

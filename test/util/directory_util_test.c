@@ -68,7 +68,9 @@ END_TEST
 // tests crawling an empty directory
 START_TEST(crawl_empty_directory_test)
 {
-
+	ck_assert_int_eq(crawl_directory(EMPTY_DIR, q), 0);
+	// check that queue is empty
+	ck_assert(dequeue(q) == NULL);
 }
 END_TEST
 
