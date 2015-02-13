@@ -33,6 +33,8 @@ while (iter != NULL) {
     free(iter);
     iter = temp;
   }
+
+  free(q);
 }
 
 int enqueue(struct queue *q, void *payload) {
