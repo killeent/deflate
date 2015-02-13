@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <check.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 #include "./directory_util_test.h"
 #include "../files/test_files.h"
@@ -27,8 +28,6 @@ static void teardown() {
 	free_queue(q, free_str);	
 }
 
-// helper function
-
 // tests trying to crawl a directory specified by an invalid path
 START_TEST(crawl_invalid_directory_test)
 {
@@ -47,7 +46,22 @@ END_TEST
 // tests trying to crawl a directory we don't have permission to read
 START_TEST(crawl_directory_without_permission_test)
 {
+	int res;
 
+	// make directory unreadable
+	res = chmod(EMPTY_DIR, 0);
+	if (res != 0) {
+		if (errno == EPERM) {
+			ck_abort_msg("cannot perform necessary chmod");
+		}
+		// todo: this could probably be better
+		ck_abort_msg("unknown error");
+	}
+
+	ck_assert_int_eq(crawl_directory(EMPTY_DIR, q), EACCES);
+
+	// make it readable again (chmod 755)
+	chmod(EMPTY_DIR, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
 }
 END_TEST
 
