@@ -24,7 +24,7 @@ int main() {
 
   runner = srunner_create(bs);
   srunner_add_suite(runner, queue);
-//  srunner_add_suite(runner, dir_util);
+  srunner_add_suite(runner, dir_util);
   srunner_add_suite(runner, heap);
   srunner_add_suite(runner, freq);
 
