@@ -21,4 +21,18 @@
  */
 int crawl_directory(char *path, struct queue *files);
 
+/**
+ * Joins the paths specified by path1 and path2.
+ *
+ * @param path1 the prefix path.
+ * @param path2 the suffix path.
+ * @param combined output parameter for the combined path. It is
+ * the client's responsibility to free the memory associated with
+ * combined.
+ *
+ * @return 0 on success, with the joined path in combined, otherwise
+ * error and combined has not been allocated. 
+ */
+int join_path(char *path1, char *path2, char **combined);
+
 #endif

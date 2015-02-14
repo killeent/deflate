@@ -13,5 +13,6 @@
 
 // dirs
 #define EMPTY_DIR "./test/files/empty_dir"
+#define SINGLE_FILE_DIR "./test/files/single_file_dir"
 
 #endif

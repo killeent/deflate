@@ -7,13 +7,76 @@
 #include <check.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <stdio.h>
 
 #include "./directory_util_test.h"
 #include "../files/test_files.h"
 #include "../../src/util/queue.h"
 #include "../../src/util/directory_util.h"
 
-struct queue *q;
+// tests for join_path
+
+// tests joining two empty paths
+START_TEST(join_empty_paths_test)
+{
+	char p1[1], p2[1], *res, ex[1];
+
+	p1[0] = '\0';
+	p2[0] = '\0';
+	ex[0] = '\0';
+	ck_assert_int_eq(join_path(p1, p2, &res), 0);
+	ck_assert_int_eq(strcmp(ex, res), 0);
+	free(res);
+}
+END_TEST
+
+// tests joining an empty path with a non-empty path
+START_TEST(join_paths_first_path_empty_test)
+{
+	char *res;
+
+	char p1[1] = "";
+	char p2[4] = "abc";
+	char ex[4] = "abc";
+
+	ck_assert_int_eq(join_path(p1, p2, &res), 0);
+	ck_assert_int_eq(strcmp(ex, res), 0);
+	free(res);
+}
+END_TEST
+
+START_TEST(join_paths_second_path_empty_test)
+{
+	char *res;
+
+	char p1[4] = "abc";
+	char p2[1] = "";
+	char ex[5] = "abc/";
+
+	ck_assert_int_eq(join_path(p1, p2, &res), 0);
+	ck_assert_int_eq(strcmp(ex, res), 0);
+	free(res);
+}	
+END_TEST
+
+// tests joining two non-empty paths
+START_TEST(join_paths_non_empty_paths)
+{
+	char *res;
+
+	char p1[4] = "abc";
+	char p2[4] = "def";
+	char ex[8] = "abc/def";
+
+	ck_assert_int_eq(join_path(p1, p2, &res), 0);
+	ck_assert_int_eq(strcmp(ex, res), 0);
+	free(res);
+}
+END_TEST
+
+// tests for crawl_directory
+
+static struct queue *q;
 
 static void free_str(void *str) {
 	free(str);
@@ -77,7 +140,14 @@ END_TEST
 // tests crawling a directory with a single file
 START_TEST(crawl_single_file_directory_test)
 {
+	void *file;
 
+	ck_assert_int_eq(crawl_directory(SINGLE_FILE_DIR, q), 0);
+	
+	// check that queue has one element
+	file = dequeue(q);
+	ck_assert(file != NULL);
+	// free_str(file);
 }
 END_TEST
 
@@ -130,26 +200,34 @@ END_TEST
 
 Suite *directory_util_suite() {
 	Suite *s;
-	TCase *tc_core;
+	TCase *tc_crawl, *tc_join;
 
 	s = suite_create("directory_util");
 
-	tc_core = tcase_create("core");
-	tcase_add_checked_fixture(tc_core, setup, teardown);
+	tc_join = tcase_create("join");
 
-	tcase_add_test(tc_core, crawl_invalid_directory_test);
-	tcase_add_test(tc_core, crawl_file_directory_test);
-	tcase_add_test(tc_core, crawl_directory_without_permission_test);
-	tcase_add_test(tc_core, crawl_empty_directory_test);
-	tcase_add_test(tc_core, crawl_single_file_directory_test);
-	tcase_add_test(tc_core, crawl_single_file_without_permission_directory_test);
-	tcase_add_test(tc_core, crawl_multi_file_directory_test);
-	tcase_add_test(tc_core, crawl_multi_file_without_permission_directory_test);
-	tcase_add_test(tc_core, crawl_empty_directory_recursive_test);
-	tcase_add_test(tc_core, crawl_single_file_directory_recursive_test);
-	tcase_add_test(tc_core, crawl_multi_file_directory_recursive_test);
+	tcase_add_test(tc_join, join_empty_paths_test);
+	tcase_add_test(tc_join, join_paths_first_path_empty_test);
+	tcase_add_test(tc_join, join_paths_second_path_empty_test);
+	tcase_add_test(tc_join, join_paths_non_empty_paths);
 
-	suite_add_tcase(s, tc_core);
+	tc_crawl = tcase_create("crawl");
+	tcase_add_checked_fixture(tc_crawl, setup, teardown);
+
+	tcase_add_test(tc_crawl, crawl_invalid_directory_test);
+	tcase_add_test(tc_crawl, crawl_file_directory_test);
+	tcase_add_test(tc_crawl, crawl_directory_without_permission_test);
+	tcase_add_test(tc_crawl, crawl_empty_directory_test);
+	tcase_add_test(tc_crawl, crawl_single_file_directory_test);
+	tcase_add_test(tc_crawl, crawl_single_file_without_permission_directory_test);
+	tcase_add_test(tc_crawl, crawl_multi_file_directory_test);
+	tcase_add_test(tc_crawl, crawl_multi_file_without_permission_directory_test);
+	tcase_add_test(tc_crawl, crawl_empty_directory_recursive_test);
+	tcase_add_test(tc_crawl, crawl_single_file_directory_recursive_test);
+	tcase_add_test(tc_crawl, crawl_multi_file_directory_recursive_test);
+
+	suite_add_tcase(s, tc_join);
+	suite_add_tcase(s, tc_crawl);
 
 	return s;
 }
