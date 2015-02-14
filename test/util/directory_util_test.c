@@ -140,7 +140,7 @@ START_TEST(crawl_empty_directory_test)
 {
 	ck_assert_int_eq(crawl_directory(EMPTY_DIR, q), 0);
 	// check that queue is empty
-	ck_assert(dequeue(q) == NULL);
+	ck_assert_int_eq(queue_count(q), 0);
 }
 END_TEST
 
@@ -154,7 +154,7 @@ START_TEST(crawl_single_file_directory_test)
 	
 	// check that queue has one element
 	file = dequeue(q);
-	ck_assert(file != NULL);
+	ck_assert_int_eq(queue_count(q), 0);
 
 	ck_assert_int_eq(join_path(SINGLE_FILE_DIR, SINGLE_FILE_DIR_FILE, &ex), 0);
 	ck_assert_int_eq(strcmp(file, ex), 0);
@@ -191,7 +191,9 @@ END_TEST
 // and the top-level directories contain no files
 START_TEST(crawl_empty_directory_recursive_test)
 {
-
+	ck_assert_int_eq(crawl_directory(RECURSIVE_EMPTY_DIR, q), 0);
+	// check that queue is empty
+	ck_assert_int_eq(queue_count(q), 0);
 }
 END_TEST
 
@@ -199,7 +201,29 @@ END_TEST
 // every directory
 START_TEST(crawl_single_file_directory_recursive_test)
 {
+	char *ex;
 
+	ck_assert_int_eq(crawl_directory(RECURSIVE_SINGLE_FILE_DIR, q), 0);
+	
+	// check that queue has two element; and they are the elements
+	// that we expect
+	ck_assert_int_eq(queue_count(q), 2);
+
+	ck_assert_int_eq(
+		join_path(RECURSIVE_SINGLE_FILE_DIR, SINGLE_FILE_DIR_FILE, &ex), 
+		0);
+	ck_assert_int_eq(
+		queue_contains(q, (void *)ex, eq_string),
+		true);
+	free(ex);
+
+	ck_assert_int_eq(
+		join_path(RECURSIVE_SINGLE_FILE_DIR_SUB_DIR, SINGLE_FILE_DIR_FILE, &ex), 
+		0);
+	ck_assert_int_eq(
+		queue_contains(q, (void *)ex, eq_string),
+		true);
+	free(ex);
 }
 END_TEST
 
@@ -207,7 +231,31 @@ END_TEST
 // every directory
 START_TEST(crawl_multi_file_directory_recursive_test)
 {
+	unsigned int i;
+	char *ex;
 
+	ck_assert_int_eq(crawl_directory(RECURSIVE_MULTI_FILE_DIR, q), 0);
+
+	// check the queue contains appropriate elements
+	ck_assert_int_eq(queue_count(q), MULTI_FILE_DIR_COUNT * 2);
+
+	for (i = 0; i < MULTI_FILE_DIR_COUNT; i++) {
+		// get the full path
+		ck_assert_int_eq(
+			join_path(RECURSIVE_MULTI_FILE_DIR, multi_file_dir_files[i], &ex),
+			0);
+		ck_assert_int_eq(
+			queue_contains(q, (void *)ex, eq_string),
+			true);
+		free(ex);
+		ck_assert_int_eq(
+			join_path(RECURSIVE_MULTI_FILE_DIR_SUB_DIR, multi_file_dir_files[i], &ex),
+			0);
+		ck_assert_int_eq(
+			queue_contains(q, (void *)ex, eq_string),
+			true);
+		free(ex);
+	}
 }
 END_TEST
 
