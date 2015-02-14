@@ -38,7 +38,9 @@ START_TEST(simple_enqueue_dequeue_test) {
   ck_assert(data != NULL);
   
   ck_assert_int_eq(enqueue(q, (void *)data), 0);
+  ck_assert_int_eq(queue_count(q), 1);
   ck_assert_ptr_eq((int *)dequeue(q), data);
+  ck_assert_int_eq(queue_count(q), 0);
 
   free(data);
 }
@@ -68,9 +70,13 @@ START_TEST(queue_maintains_ordering_test)
   ck_assert_int_eq(enqueue(q, (void *)a), 0);
   ck_assert_int_eq(enqueue(q, (void *)b), 0);
   ck_assert_int_eq(enqueue(q, (void *)c), 0);
+  ck_assert_int_eq(queue_count(q), 3);
   ck_assert_ptr_eq((int *)dequeue(q), a);
+  ck_assert_int_eq(queue_count(q), 2);
   ck_assert_ptr_eq((int *)dequeue(q), b);
+  ck_assert_int_eq(queue_count(q), 1);
   ck_assert_ptr_eq((int *)dequeue(q), c);
+  ck_assert_int_eq(queue_count(q), 0);
 
   free(a);
   free(b);
@@ -97,12 +103,18 @@ START_TEST(queue_maintains_ordering_interleaved_test)
   // in the correct order
   ck_assert_int_eq(enqueue(q, (void *)a), 0);
   ck_assert_int_eq(enqueue(q, (void *)b), 0);
+  ck_assert_int_eq(queue_count(q), 2);
   ck_assert_ptr_eq((int *)dequeue(q), a);
+  ck_assert_int_eq(queue_count(q), 1);
   ck_assert_int_eq(enqueue(q, (void *)c), 0);
+  ck_assert_int_eq(queue_count(q), 2);
   ck_assert_ptr_eq((int *)dequeue(q), b);
+  ck_assert_int_eq(queue_count(q), 1);
   ck_assert_int_eq(enqueue(q, (void *)d), 0);
+  ck_assert_int_eq(queue_count(q), 2);
   ck_assert_ptr_eq((int *)dequeue(q), c);
   ck_assert_ptr_eq((int *)dequeue(q), d);
+  ck_assert_int_eq(queue_count(q), 0);
 
   free(a);
   free(b);

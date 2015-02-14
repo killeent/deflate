@@ -13,6 +13,7 @@ struct queue_node {
 struct queue {
   struct queue_node *head;
   struct queue_node *tail;
+  unsigned int count;
 };
 
 /**
@@ -50,5 +51,14 @@ int enqueue(struct queue *q, void *payload);
  * queue is empty.
  */
 void *dequeue(struct queue *q);
+
+/**
+ * Get the number of elements in the queue.
+ *
+ * @param q the queue to query.
+ *
+ * @return the number of elements in the queue.
+ */
+unsigned int queue_count(struct queue *q);
 
 #endif

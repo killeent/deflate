@@ -10,6 +10,7 @@ struct queue *allocate_queue() {
     return NULL;
   }
   q->head = q->tail = NULL;
+  q->count = 0;
   return q;
 }
 
@@ -44,6 +45,7 @@ int enqueue(struct queue *q, void *payload) {
     q->tail->next = n;
     q->tail = n;
   }
+  q->count++;
   return 0;
 }
 
@@ -66,6 +68,13 @@ void *dequeue(struct queue *q) {
       q->head = q->head->next;
       free(temp); 
     }
+    q->count--;
     return res;
   }
+}
+
+unsigned int queue_count(struct queue *q) {
+  assert(q != NULL);
+
+  return q->count;
 }
