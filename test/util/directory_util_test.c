@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "./directory_util_test.h"
 #include "../files/test_files.h"
@@ -78,8 +79,14 @@ END_TEST
 
 static struct queue *q;
 
+// helper function to free a string
 static void free_str(void *str) {
 	free(str);
+}
+
+// helper function to compare two strings
+static bool eq_string(void *str_a, void *str_b) {
+	return strcmp((char *)str_a, (char *)str_b) == 0;
 }
 
 static void setup() {	
@@ -159,14 +166,24 @@ END_TEST
 // tests crawling a directory with multiple files
 START_TEST(crawl_multi_file_directory_test)
 {
-	char *elts[3];
 	unsigned int i;
+	char *ex;
 
 	ck_assert_int_eq(crawl_directory(MULTI_FILE_DIR, q), 0);
 
 	// check the queue contains appropriate elements
 	ck_assert_int_eq(queue_count(q), MULTI_FILE_DIR_COUNT);
 
+	for (i = 0; i < MULTI_FILE_DIR_COUNT; i++) {
+		// get the full path
+		ck_assert_int_eq(
+			join_path(MULTI_FILE_DIR, multi_file_dir_files[i], &ex),
+			0);
+		ck_assert_int_eq(
+			queue_contains(q, (void *)ex, eq_string),
+			true);
+		free(ex);
+	}
 }
 END_TEST
 

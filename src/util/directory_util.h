@@ -33,6 +33,6 @@ int crawl_directory(char *path, struct queue *files);
  * @return 0 on success, with the joined path in combined, otherwise
  * error and combined has not been allocated. 
  */
-int join_path(char *path1, char *path2, char **combined);
+int join_path(const char *path1, const char *path2, char **combined);
 
 #endif

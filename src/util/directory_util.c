@@ -68,7 +68,7 @@ int crawl_directory(char *path, struct queue *files) {
 	return 0;
 }
 
-int join_path(char *path1, char *path2, char **combined) {
+int join_path(const char *path1, const char *path2, char **combined) {
 	assert(path1 != NULL);
 	assert(path2 != NULL);
 	assert(combined != NULL);
