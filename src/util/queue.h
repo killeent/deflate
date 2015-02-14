@@ -3,6 +3,8 @@
 #ifndef _QUEUE_H_
 #define _QUEUE_H_
 
+#include <stdbool.h>
+
 // A simple Queue ADT implemented with a Linked List
 
 struct queue_node {
@@ -60,5 +62,16 @@ void *dequeue(struct queue *q);
  * @return the number of elements in the queue.
  */
 unsigned int queue_count(struct queue *q);
+
+/**
+ * Checks to see if the queue contains the specified element.
+ * 
+ * @param q the queue to query.
+ * @param elt the element to look for.
+ * @param quality_fn function to determine equality.
+ *
+ * @return true if q contains the specified elt, otherwise false.
+ */
+bool queue_contains(struct queue *q, void *elt, bool (equality_fn)(void *, void *));
 
 #endif

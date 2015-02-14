@@ -32,7 +32,7 @@ int enqueue(struct queue *q, void *payload) {
   assert(payload != NULL);
 
   struct queue_node *n =
-    (struct queue_node *)malloc(sizeof(struct queue_node));
+    (struct queue_node *)calloc(1, sizeof(struct queue_node));
   if (n == NULL) {
     return 1;
   }
@@ -75,6 +75,22 @@ void *dequeue(struct queue *q) {
 
 unsigned int queue_count(struct queue *q) {
   assert(q != NULL);
-
   return q->count;
+}
+
+bool queue_contains(struct queue *q, void *elt, bool (equality_fn)(void *, void *)) {
+  assert(q != NULL);
+  assert(elt != NULL);
+  assert(equality_fn != NULL);
+
+  struct queue_node *iter = q->head;
+
+  while (iter != NULL) {
+    if (equality_fn(iter->payload, elt)) {
+      return true;
+    }
+    iter = iter->next;
+  }
+
+  return false;
 }

@@ -4,15 +4,25 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <stdbool.h>
 
 #include "./queue_test.h"
 #include "../../src/util/queue.h"
 
 // global queue for testing
-struct queue *q;
+static struct queue *q;
 
-static void free_int(void * pl) {
+static void free_int(void *pl) {
   free(pl);
+}
+
+static bool eq_int(void *int_a, void *int_b) {
+  int a, b;
+
+  a = *((int *)int_a);
+  b = *((int *)int_b);
+
+  return a == b;
 }
 
 static void setup() {
@@ -43,6 +53,30 @@ START_TEST(simple_enqueue_dequeue_test) {
   ck_assert_int_eq(queue_count(q), 0);
 
   free(data);
+}
+END_TEST
+
+// tests simple contains for an element in and not in the queue
+START_TEST(simple_queue_contains_test)
+{
+  int *data, *contained, *missing;
+
+  data = (int *)malloc(sizeof(int));
+  ck_assert(data != NULL);
+  *data = 1;
+  contained = (int *)malloc(sizeof(int));
+  ck_assert(contained != NULL);
+  *contained = 1;
+  missing = (int *)malloc(sizeof(int));
+  ck_assert(missing != NULL);
+  *missing = 2;
+  
+  ck_assert_int_eq(enqueue(q, (void *)data), 0);
+  ck_assert_int_eq(queue_contains(q, (void *)contained, eq_int), true);
+  ck_assert_int_eq(queue_contains(q, (void *)missing, eq_int), false);
+
+  free(contained);
+  free(missing);
 }
 END_TEST
 
@@ -163,6 +197,7 @@ Suite *queue_suite() {
 
   tcase_add_test(tc_core, allocation_test);
   tcase_add_test(tc_core, simple_enqueue_dequeue_test);
+  tcase_add_test(tc_core, simple_queue_contains_test);
   tcase_add_test(tc_core, dequeue_empty_queue_test);
   tcase_add_test(tc_core, queue_maintains_ordering_test);
   tcase_add_test(tc_core, queue_maintains_ordering_interleaved_test);

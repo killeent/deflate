@@ -159,9 +159,14 @@ END_TEST
 // tests crawling a directory with multiple files
 START_TEST(crawl_multi_file_directory_test)
 {
-	ck_assert_int_eq(crawl_directory(SINGLE_FILE_DIR, q), 0);
+	char *elts[3];
+	unsigned int i;
+
+	ck_assert_int_eq(crawl_directory(MULTI_FILE_DIR, q), 0);
 
 	// check the queue contains appropriate elements
+	ck_assert_int_eq(queue_count(q), MULTI_FILE_DIR_COUNT);
+
 }
 END_TEST
 
