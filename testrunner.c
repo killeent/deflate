@@ -8,21 +8,24 @@
 #include "./test/util/bitstream_test.h"
 #include "./test/util/queue_test.h"
 #include "./test/util/directory_util_test.h"
+#include "./test/util/heap_test.h"
 #include "./test/huffman/frequency_test.h"
 
 int main() {
-  Suite *bs, *queue, *dir_util, *freq;
+  Suite *bs, *queue, *dir_util, *heap, *freq;
   SRunner *runner;
   int failures;
 
   bs = bitstream_suite();
   freq = frequency_suite();
   dir_util = directory_util_suite();
+  heap = heap_suite();
   queue = queue_suite();
 
   runner = srunner_create(bs);
   srunner_add_suite(runner, queue);
-  srunner_add_suite(runner, dir_util);
+//  srunner_add_suite(runner, dir_util);
+  srunner_add_suite(runner, heap);
   srunner_add_suite(runner, freq);
 
   // for debugging

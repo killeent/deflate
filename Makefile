@@ -14,7 +14,7 @@ TEST_UTIL = test/util
 # files
 OBJECTS = testrunner.o bitstream_test.o bitstream.o frequency.o frequency_test.o \
 hufftree.o queue.o queue_test.o directory_util.o directory_util_test.o test_files_shared.o \
-heap.o
+heap.o heap_test.o
 
 frequency.o: $(HUFFMAN)/frequency.c $(HUFFMAN)/frequency.h
 	$(CC) $(CFLAGS) -c $(HUFFMAN)/frequency.c
@@ -51,6 +51,9 @@ queue_test.o: $(TEST_UTIL)/queue_test.c $(TEST_UTIL)/queue_test.h
 
 heap.o: $(UTIL)/heap.c $(UTIL)/heap.h
 	$(CC) $(CFLAGS) -c $(UTIL)/heap.c
+
+heap_test.o: $(TEST_UTIL)/heap_test.h $(TEST_UTIL)/heap_test.c
+	$(CC) $(CFLAGS) -c $(TEST_UTIL)/heap_test.c
 
 test_files_shared.o: $(TEST_FILES)/test_files_shared.c $(TEST_FILES)/test_files.h
 		$(CC) $(CFLAGS) -c $(TEST_FILES)/test_files_shared.c
