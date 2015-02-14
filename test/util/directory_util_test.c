@@ -141,13 +141,18 @@ END_TEST
 START_TEST(crawl_single_file_directory_test)
 {
 	void *file;
+	char *ex;
 
 	ck_assert_int_eq(crawl_directory(SINGLE_FILE_DIR, q), 0);
 	
 	// check that queue has one element
 	file = dequeue(q);
 	ck_assert(file != NULL);
-	// free_str(file);
+
+	ck_assert_int_eq(join_path(SINGLE_FILE_DIR, "empty.txt", &ex), 0);
+	ck_assert_int_eq(strcmp(file, ex), 0);
+	free(file);
+	free(ex);
 }
 END_TEST
 
