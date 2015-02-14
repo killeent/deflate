@@ -149,33 +149,19 @@ START_TEST(crawl_single_file_directory_test)
 	file = dequeue(q);
 	ck_assert(file != NULL);
 
-	ck_assert_int_eq(join_path(SINGLE_FILE_DIR, "empty.txt", &ex), 0);
+	ck_assert_int_eq(join_path(SINGLE_FILE_DIR, SINGLE_FILE_DIR_FILE, &ex), 0);
 	ck_assert_int_eq(strcmp(file, ex), 0);
 	free(file);
 	free(ex);
 }
 END_TEST
 
-// tests crawling a directory with a single file that we don't have
-// permission to read
-START_TEST(crawl_single_file_without_permission_directory_test)
-{
-
-}
-END_TEST
-
 // tests crawling a directory with multiple files
 START_TEST(crawl_multi_file_directory_test)
 {
+	ck_assert_int_eq(crawl_directory(SINGLE_FILE_DIR, q), 0);
 
-}
-END_TEST
-
-// tests crawling a directory with multiple files, where at least
-// one file we don't have permission to read
-START_TEST(crawl_multi_file_without_permission_directory_test)
-{
-
+	// check the queue contains appropriate elements
 }
 END_TEST
 
@@ -224,9 +210,7 @@ Suite *directory_util_suite() {
 	tcase_add_test(tc_crawl, crawl_directory_without_permission_test);
 	tcase_add_test(tc_crawl, crawl_empty_directory_test);
 	tcase_add_test(tc_crawl, crawl_single_file_directory_test);
-	tcase_add_test(tc_crawl, crawl_single_file_without_permission_directory_test);
 	tcase_add_test(tc_crawl, crawl_multi_file_directory_test);
-	tcase_add_test(tc_crawl, crawl_multi_file_without_permission_directory_test);
 	tcase_add_test(tc_crawl, crawl_empty_directory_recursive_test);
 	tcase_add_test(tc_crawl, crawl_single_file_directory_recursive_test);
 	tcase_add_test(tc_crawl, crawl_multi_file_directory_recursive_test);

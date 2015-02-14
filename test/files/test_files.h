@@ -13,6 +13,12 @@
 
 // dirs
 #define EMPTY_DIR "./test/files/empty_dir"
+
 #define SINGLE_FILE_DIR "./test/files/single_file_dir"
+#define SINGLE_FILE_DIR_FILE "empty.txt"
+
+#define MULTI_FILE_DIR "./test/files/multi_file_dir"
+#define MULTI_FILE_DIR_COUNT 3
+extern const char *multi_file_dir_files[3];
 
 #endif
