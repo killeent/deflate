@@ -41,7 +41,7 @@ int crawl_directory(char *path, struct queue *files) {
 			// join path with file
 			res = join_path(path, de->d_name, &file_name);
 			if (res != 0) {
-				return 0;
+				return res;
 			}
 
 			if (file_type == DT_DIR) {

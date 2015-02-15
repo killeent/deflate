@@ -166,10 +166,3 @@ static void bubble_down(struct heap *hp, unsigned int index) {
 		}
 	}
 }
-
-
-
-
-
-
-
