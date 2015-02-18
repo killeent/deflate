@@ -7,7 +7,7 @@
 #include "./heap.h"
 
 // helper function declarations
-static void bubble_up(struct heap *hp, unsigned int index);
+static void bubble_up(struct heap *hp, int index);
 static void bubble_down(struct heap *hp, unsigned int index);
 static int expand_heap(struct heap *hp);
 
@@ -115,7 +115,7 @@ static int expand_heap(struct heap *hp) {
 
 // bubble up the value at index, swapping it with its parent
 // as long as it has higher priority (lower priority value)
-static void bubble_up(struct heap *hp, unsigned int index) {
+static void bubble_up(struct heap *hp, int index) {
 	assert(hp != NULL);
 
 	int parent;
